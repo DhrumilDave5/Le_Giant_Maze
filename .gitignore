@@ -1,0 +1,5 @@
+# Ignore the PyCharm cache files
+__pycache__/
+
+# Ignoring my files
+Le_Dev/
