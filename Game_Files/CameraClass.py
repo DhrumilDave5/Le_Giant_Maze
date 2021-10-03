@@ -60,8 +60,7 @@ class Camera:
                             pygame.draw.rect(self.display_surface, cd[self.maze.map[i][j]],
                                              pygame.Rect(tmp_coords, (mus, mus)))
 
-        p_tmp_coords = self.give_display_coords_pv(self.player_to_follow.rect.x,
-                                                   self.player_to_follow.rect.y)
+        p_tmp_coords = self.give_display_coords_pv(self.player_to_follow.rect.x, self.player_to_follow.rect.y)
         pygame.draw.rect(self.display_surface, self.player_to_follow.colour,
                          pygame.Rect(p_tmp_coords, (Settings.p_size, Settings.p_size)))
 
@@ -141,10 +140,8 @@ class Camera:
 
     def display_pv_with_light_effects(self):
 
-        # Basic algorithm for understanding light hotspot algorithm in
-        # LightHotspotDemonstration.py
-        # (The displaying for filled_mu around light hotspot is relatively easy to implement and
-        # thus not shown)
+        # Basic algorithm for understanding light hotspot algorithm in LightHotspotDemonstration.py
+        # (The displaying for filled_mu around light hotspot is relatively easy to implement and thus not shown)
 
         ptf = self.player_to_follow
         ds = self.display_surface
@@ -186,17 +183,13 @@ class Camera:
                 bottom_mu = self.maze.map[bottom[1]][bottom[0]]
                 left_mu = self.maze.map[left[1]][left[0]]
 
-                if (top_mu == emud or top_mu == wamud)\
-                        and top not in past_lh + present_lh + future_lh:
+                if (top_mu == emud or top_mu == wamud) and top not in past_lh + present_lh + future_lh:
                     future_lh.append(top)
-                if (right_mu == emud or right_mu == wamud)\
-                        and right not in past_lh + present_lh + future_lh:
+                if (right_mu == emud or right_mu == wamud) and right not in past_lh + present_lh + future_lh:
                     future_lh.append(right)
-                if (bottom_mu == emud or bottom_mu == wamud)\
-                        and bottom not in past_lh + present_lh + future_lh:
+                if (bottom_mu == emud or bottom_mu == wamud) and bottom not in past_lh + present_lh + future_lh:
                     future_lh.append(bottom)
-                if (left_mu == emud or left_mu == wamud)\
-                        and left not in past_lh + present_lh + future_lh:
+                if (left_mu == emud or left_mu == wamud) and left not in past_lh + present_lh + future_lh:
                     future_lh.append(left)
 
             # Updating lh lists after the logic
@@ -222,8 +215,7 @@ class Camera:
                         if 0 <= o <= len(self.maze.map[n]) - 1:
                             if self.maze.map[n][o] == wamud:
                                 tmp_coords = self.give_display_coords_pv(o * mus, n * mus)
-                                pygame.draw.rect(ds, Settings.colour_dict[wamud],
-                                                 pygame.Rect(tmp_coords, (mus, mus)))
+                                pygame.draw.rect(ds, Settings.colour_dict[wamud], pygame.Rect(tmp_coords, (mus, mus)))
 
         p_tmp_coords = self.give_display_coords_pv(ptf.rect.x, ptf.rect.y)
         pygame.draw.rect(ds, ptf.colour, pygame.Rect(p_tmp_coords, (ps, ps)))
@@ -233,10 +225,8 @@ class Camera:
         self.ymu_mv = self.y_mv // Settings.mu_size_mv
 
     def move(self, key_list):
-        down_limit = (self.maze.map_size[1] - Settings.mu_displayed_y_mv + 1) \
-                     * Settings.mu_size_mv
-        right_limit = (self.maze.map_size[0] - Settings.mu_displayed_x_mv + 1) \
-                      * Settings.mu_size_mv
+        down_limit = (self.maze.map_size[1] - Settings.mu_displayed_y_mv + 1) * Settings.mu_size_mv
+        right_limit = (self.maze.map_size[0] - Settings.mu_displayed_x_mv + 1) * Settings.mu_size_mv
         if key_list[self.up_key] and self.y_mv > 0:
             self.y_mv -= self.vel
         if key_list[self.down_key] and self.y_mv < down_limit:
@@ -265,10 +255,8 @@ class Camera:
                         pygame.draw.rect(self.display_surface, cd[self.maze.map[i][j]],
                                          pygame.Rect(tmp_coords, (mus, mus)))
 
-        p_tmp_coords = self.give_display_coords_mv(self.player_to_follow.x_cmu * mus,
-                                                   self.player_to_follow.y_cmu * mus)
-        pygame.draw.rect(self.display_surface, self.player_to_follow.colour,
-                         pygame.Rect(p_tmp_coords, (mus, mus)))
+        p_tmp_coords = self.give_display_coords_mv(self.player_to_follow.x_cmu * mus, self.player_to_follow.y_cmu * mus)
+        pygame.draw.rect(self.display_surface, self.player_to_follow.colour, pygame.Rect(p_tmp_coords, (mus, mus)))
 
     def display(self, key_list):
 
