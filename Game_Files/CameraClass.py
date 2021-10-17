@@ -22,7 +22,7 @@ class Camera:
         self.light_effects = True
         self.wa_display = False
 
-        self.vel = Settings.cam_vel
+        self.vel = Settings.mvlq
 
         self.up_key = up_key
         self.down_key = down_key
@@ -55,7 +55,7 @@ class Camera:
                             tmp_coords = self.give_display_coords_pv(j * mus, i * mus)
                             pygame.draw.rect(self.display_surface, cd[self.maze.map[i][j]],
                                              pygame.Rect(tmp_coords, (mus, mus)))
-                        elif j >= 80 and i >= 26:
+                        elif j >= 80 and i >= 26:   # Displaying only wamu
                             tmp_coords = self.give_display_coords_pv(j * mus, i * mus)
                             pygame.draw.rect(self.display_surface, cd[self.maze.map[i][j]],
                                              pygame.Rect(tmp_coords, (mus, mus)))
@@ -77,7 +77,7 @@ class Camera:
 
         ds = self.display_surface
         mus = Settings.mu_size_pv
-        o = Settings.omega
+        o = Settings.mu_size_pv // 3
         emucs = Settings.empty_mu_colour_shades
         fmucs = Settings.filled_mu_colour_shades
         fmud = Settings.filled_mu_digit
@@ -163,10 +163,11 @@ class Camera:
             present_lh.append((82, 27))
         future_lh = []
 
-        tmp_light_level = len(emucs) - Settings.render_distance
-        if tmp_light_level < 0:
-            tmp_light_level = 0
-        self.display_mu_stuff_for_light_effects(ptf.x_cmu, ptf.y_cmu, tmp_light_level)
+        if Settings.rd > 0:
+            tmp_light_level = len(emucs) - Settings.render_distance
+            if tmp_light_level < 0:
+                tmp_light_level = 0
+            self.display_mu_stuff_for_light_effects(ptf.x_cmu, ptf.y_cmu, tmp_light_level)
 
         # Displaying mu distance by distance
         for i in range(Settings.render_distance):
@@ -221,12 +222,12 @@ class Camera:
         pygame.draw.rect(ds, ptf.colour, pygame.Rect(p_tmp_coords, (ps, ps)))
 
     def update_mu_stuff_mv(self):
-        self.xmu_mv = self.x_mv // Settings.mu_size_mv
-        self.ymu_mv = self.y_mv // Settings.mu_size_mv
+        self.xmu_mv = self.x_mv // Settings.mvlq
+        self.ymu_mv = self.y_mv // Settings.mvlq
 
     def move(self, key_list):
-        down_limit = (self.maze.map_size[1] - Settings.mu_displayed_y_mv + 1) * Settings.mu_size_mv
-        right_limit = (self.maze.map_size[0] - Settings.mu_displayed_x_mv + 1) * Settings.mu_size_mv
+        down_limit = (self.maze.map_size[1] - Settings.mu_displayed_y_mv + 1) * Settings.mvlq
+        right_limit = (self.maze.map_size[0] - Settings.mu_displayed_x_mv + 1) * Settings.mvlq
         if key_list[self.up_key] and self.y_mv > 0:
             self.y_mv -= self.vel
         if key_list[self.down_key] and self.y_mv < down_limit:
@@ -241,7 +242,7 @@ class Camera:
 
     def display_mv(self, key_list):
 
-        mus = Settings.mu_size_mv
+        mus = Settings.mvlq
         cd = Settings.colour_dict
 
         self.move(key_list)

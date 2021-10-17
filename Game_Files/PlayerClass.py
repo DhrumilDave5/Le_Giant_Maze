@@ -8,9 +8,10 @@ class Player:
                  up_key, down_key, right_key, left_key):
 
         mus = Settings.mu_size_pv
+
         self.rect = pygame.Rect(0, 0, Settings.p_size, Settings.p_size)
-        spawn_mu_rect = pygame.Rect(spawn_mu[0] * mus, spawn_mu[1] * mus, mus, mus)
-        self.rect.center = spawn_mu_rect.center
+        self.rect.x += (spawn_mu[0] * mus) + (((mus - Settings.p_size) // 2) // Settings.lq) * Settings.lq
+        self.rect.y += (spawn_mu[1] * mus) + (((mus - Settings.p_size) // 2) // Settings.lq) * Settings.lq
 
         self.maze = maze
         self.vel = Settings.p_vel
