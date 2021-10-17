@@ -17,8 +17,8 @@ pygame.display.set_caption(Settings.game_display_caption)
 game_clock = pygame.time.Clock()
 
 leGameMaze = MazeClass.Maze()
-leGuy = PlayerClass.Player(Settings.p1_spawn_mu, Settings.p1_colour, leGameMaze,
-                           Settings.p1_up, Settings.p1_down, Settings.p1_right, Settings.p1_left)
+leGuy = PlayerClass.Player(Settings.p_spawn_mu, Settings.p_colour, leGameMaze,
+                           Settings.p_up, Settings.p_down, Settings.p_right, Settings.p_left)
 leCam = CameraClass.Camera(screen, leGameMaze, leGuy,
                            Settings.cam_up, Settings.cam_down, Settings.cam_right, Settings.cam_left)
 

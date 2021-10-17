@@ -1,6 +1,3 @@
-import Game_Files.Settings as Settings
-
-
 class Maze:
 
     def __init__(self):
@@ -269,8 +266,6 @@ class Maze:
                                  ]
                                 ]
 
-
-print(Settings.p2_spawn_mu, "- printing from MazeClass.py file")
 
 '''
     'First function made by me for displaying a leMap in the simplest form, kept as an artifact
