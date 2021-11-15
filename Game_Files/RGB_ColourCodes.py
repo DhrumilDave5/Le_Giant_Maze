@@ -1,5 +1,0 @@
-black = (0, 0, 0)
-dodger_blue_2nd_shade = (23, 107, 191)
-empty_mu_colour = (159, 79, 47)
-filled_mu_colour = (31, 31, 31)
-win_area_mu_colour = (255, 215, 31)
