@@ -12,7 +12,7 @@ class Player:
     def tmp(self):
         pass
 
-    def __init__(self, world, up_key, right_key, down_key, left_key):
+    def __init__(self, world, up_key=pygame.K_w, right_key=pygame.K_d, down_key=pygame.K_s, left_key=pygame.K_a):
 
         self.WORLD = world
         self.UP_KEY = up_key
