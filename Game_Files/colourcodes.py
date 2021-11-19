@@ -1,12 +1,12 @@
-from pygame.colordict import THECOLORS
+from pygame import colordict as cd
 
-COLOURS = {"world bg colour": THECOLORS["black"],
-           "player colour": THECOLORS["dodgerblue3"],
-           "world floor colour": THECOLORS["sienna"],
-           "world cave rock colour": THECOLORS["grey12"],
+COLOURS = {"world bg colour": cd.THECOLORS["black"],
+           "player colour": cd.THECOLORS["dodgerblue3"],
+           "world floor colour": cd.THECOLORS["sienna"],
+           "world cave rock colour": cd.THECOLORS["grey12"],
            "world win area colour": (255, 215, 31),
            # THECOLORS["gold"] has value (255, 215, 0)
-           "world win text colour": THECOLORS["black"]
+           "world win text colour": cd.THECOLORS["black"]
            }
 
 

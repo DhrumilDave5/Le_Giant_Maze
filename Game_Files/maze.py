@@ -1,17 +1,14 @@
-from Game_Files.simplemaze import SIMPLE_MAZE_MATRIX, transpose
-from Game_Files.simplemaze import CONSTANTS as SIMPLE_MAZE_CONSTANTS
+from Game_Files import simplemaze
 
-CONSTANTS = {"empty map unit":
-             SIMPLE_MAZE_CONSTANTS["empty simple maze unit"],
-             "filled map unit":
-             SIMPLE_MAZE_CONSTANTS["filled simple maze unit"],
+CONSTANTS = {"empty map unit": 0,
+             "filled map unit": 1,
              "player spawn map unit": 2,
              "win map unit": 3,
              }
 
 
 def create_maze_matrix() -> list[list[int]]:
-    m = SIMPLE_MAZE_MATRIX[:]
+    m = simplemaze.MATRIX[:]
 
     """
     '''dlt_it:'''
@@ -65,12 +62,9 @@ def create_maze_matrix() -> list[list[int]]:
     CONSTANTS["map units near win area"] = list1
     """
 
-    a = SIMPLE_MAZE_CONSTANTS["start point simple maze unit"]
-    b = SIMPLE_MAZE_CONSTANTS["end point simple maze unit"]
-    c = CONSTANTS["empty map unit"]
-    d = CONSTANTS["filled map unit"]
-    e = CONSTANTS["player spawn map unit"]
-    f = CONSTANTS["win map unit"]
+    a = CONSTANTS["filled map unit"]
+    b = CONSTANTS["player spawn map unit"]
+    c = CONSTANTS["win map unit"]
 
     up_spawn_area = [[1, 1, 1, 1, 1],
                      [1, 0, 0, 0, 1],
@@ -120,6 +114,11 @@ def create_maze_matrix() -> list[list[int]]:
                           [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                           ]
+
+    def transpose(matrix: list[list]) -> list[list]:
+        return [[matrix[q][p] for q in range(len(matrix))]
+                for p in range(len(matrix[0]))]
+
     up_spawn_area = transpose(up_spawn_area)
     right_spawn_area = transpose(right_spawn_area)
     down_spawn_area = transpose(down_spawn_area)
@@ -193,18 +192,18 @@ def create_maze_matrix() -> list[list[int]]:
     """
 
     for i in range(len(m))[1:-1]:
-        if m[i][0] == a:
+        if m[i][0] == b:
             start_x = i
-            m[start_x][0] = c
+            m[start_x][0] = CONSTANTS["empty map unit"]
             if start_x == 1:
                 start_x += 1
             if start_x == len(m) - 2:
                 start_x -= 1
             start_direction = "up"
 
-    if a in m[-1][1:-1]:
-        start_y = m[-1].index(a)
-        m[-1][start_y] = c
+    if b in m[-1][1:-1]:
+        start_y = m[-1].index(b)
+        m[-1][start_y] = CONSTANTS["empty map unit"]
         if start_y == 1:
             start_y += 1
         if start_y == len(m[-1]) - 2:
@@ -212,18 +211,18 @@ def create_maze_matrix() -> list[list[int]]:
         start_direction = "right"
 
     for i in range(len(m))[1:-1]:
-        if m[i][-1] == a:
+        if m[i][-1] == b:
             start_x = i
-            m[start_x][-1] = c
+            m[start_x][-1] = CONSTANTS["empty map unit"]
             if start_x == 1:
                 start_x += 1
             if start_x == len(m) - 2:
                 start_x -= 1
             start_direction = "down"
 
-    if a in m[0][1:-1]:
-        start_y = m[0].index(a)
-        m[0][start_y] = c
+    if b in m[0][1:-1]:
+        start_y = m[0].index(b)
+        m[0][start_y] = CONSTANTS["empty map unit"]
         if start_y == 1:
             start_y += 1
         if start_y == len(m[0]) - 2:
@@ -231,18 +230,18 @@ def create_maze_matrix() -> list[list[int]]:
         start_direction = "left"
 
     for i in range(len(m))[1:-1]:
-        if m[i][0] == b:
+        if m[i][0] == c:
             end_x = i
-            m[end_x][0] = c
+            m[end_x][0] = CONSTANTS["empty map unit"]
             end_direction = "up"
             if start_direction == "left":
                 end_x += len(left_spawn_area)
             if end_x - 1 + len(up_near_win_area) > len(m):
                 up_near_win_area_extending = True
 
-    if b in m[-1][1:-1]:
-        end_y = m[-1].index(b)
-        m[-1][end_y] = c
+    if c in m[-1][1:-1]:
+        end_y = m[-1].index(c)
+        m[-1][end_y] = CONSTANTS["empty map unit"]
         end_direction = "right"
         if start_direction == "up":
             end_y += len(up_spawn_area[0])
@@ -250,9 +249,9 @@ def create_maze_matrix() -> list[list[int]]:
             right_near_win_area_extending = True
 
     for i in range(len(m))[1:-1]:
-        if m[i][-1] == b:
+        if m[i][-1] == c:
             end_x = i
-            m[end_x][-1] = c
+            m[end_x][-1] = CONSTANTS["empty map unit"]
             end_direction = "down"
             if start_direction == "left":
                 end_x += len(left_spawn_area)
@@ -265,83 +264,77 @@ def create_maze_matrix() -> list[list[int]]:
         tmp = len(up_spawn_area)
         for i in range(len(m)):
             if i < start_x - (tmp // 2) or i > start_x + (tmp // 2):
-                m[i] = [d, ] * len(up_spawn_area[0]) + m[i]
+                m[i] = [a, ] * len(up_spawn_area[0]) + m[i]
             else:
                 m[i] = up_spawn_area[i - (start_x - (tmp // 2))] + m[i]
 
     elif start_direction == "right":
         tmp = len(right_spawn_area[0])
         for i in range(len(right_spawn_area)):
-            m += [[d, ] * (start_y - (tmp // 2))
+            m += [[a, ] * (start_y - (tmp // 2))
                   + right_spawn_area[i]
-                  + [d, ] * (len(m[0]) - (start_y + (tmp // 2) + 1)), ]
+                  + [a, ] * (len(m[0]) - (start_y + (tmp // 2) + 1)), ]
 
     elif start_direction == "down":
         tmp = len(up_spawn_area)
         for i in range(len(m)):
             if i < start_x - (tmp // 2) or i > start_x + (tmp // 2):
-                m[i] += [d, ] * len(down_spawn_area[0])
+                m[i] += [a, ] * len(down_spawn_area[0])
             else:
                 m[i] += down_spawn_area[i - (start_x - (tmp // 2))]
 
     elif start_direction == "left":
         tmp = len(left_spawn_area[0])
         for i in range(len(left_spawn_area)):
-            m = [[d, ] * (start_y - (tmp // 2))
+            m = [[a, ] * (start_y - (tmp // 2))
                  + left_spawn_area[len(left_spawn_area) - 1 - i]
-                 + [d, ] * (len(m[0]) - start_y - (tmp // 2) - 1), ] + m
+                 + [a, ] * (len(m[0]) - start_y - (tmp // 2) - 1), ] + m
 
     # Adding Filled Map Units as per the End Direction
 
     if end_direction == "up":
-        tmp = len(up_near_win_area)
-        tmp2 = len(m)
-        tmp3 = len(m[-1])
         for i in range(len(m)):
-            if i < end_x - 1 or i > end_x + tmp - 2:
-                m[i] = [d, ] * len(up_near_win_area[0]) + m[i]
+            if i < end_x - 1 or i > end_x + len(up_near_win_area) - 2:
+                m[i] = [a, ] * len(up_near_win_area[0]) + m[i]
             else:
                 m[i] = up_near_win_area[i - (end_x - 1)] + m[i]
         if up_near_win_area_extending:
-            for i in range((end_x - 1 + tmp) - tmp2):
-                m += [up_near_win_area[i + (tmp2 - (end_x - 1))]
-                      + [d, ] * tmp3, ]
+            for i in range((end_x - 1 + len(up_near_win_area)) - len(m)):
+                m += [up_near_win_area[i + (len(m) - (end_x - 1))]
+                      + [a, ] * len(m[-1]), ]
 
     elif end_direction == "right":
         if not right_near_win_area_extending:
             for i in range(len(right_near_win_area_1)):
-                m += [[d, ] * (end_y - 3)
+                m += [[a, ] * (end_y - 3)
                       + right_near_win_area_1[i]
-                      + [d, ] * (len(m[0]) - (end_y + 2)), ]
+                      + [a, ] * (len(m[0]) - (end_y + 2)), ]
         else:
             for i in range(len(right_near_win_area_2)):
-                m += [[d, ] * (end_y - 1)
+                m += [[a, ] * (end_y - 1)
                       + right_near_win_area_2[i]
-                      + [d, ] * (len(m[0]) - (end_y + 4)), ]
+                      + [a, ] * (len(m[0]) - (end_y + 4)), ]
 
     elif end_direction == "down":
-        tmp = len(down_near_win_area)
-        tmp2 = len(m)
-        tmp3 = len(m[-1])
         for i in range(len(m)):
-            if i < end_x - 1 or i > end_x + tmp - 2:
-                m[i] += [d, ] * len(down_near_win_area[0])
+            if i < end_x - 1 or i > end_x + len(down_near_win_area) - 2:
+                m[i] += [a, ] * len(down_near_win_area[0])
             else:
                 m[i] += down_near_win_area[i - (end_x - 1)]
         if down_near_win_area_extending:
-            for i in range((end_x - 1 + tmp) - tmp2):
-                m += [[d, ] * tmp3
-                      + down_near_win_area[i + (tmp2 - (end_x - 1))], ]
+            for i in range((end_x - 1 + len(down_near_win_area)) - len(m)):
+                m += [[a, ] * len(m[-1])
+                      + down_near_win_area[i + (len(m) - (end_x - 1))], ]
 
     # Finding Player Spawn & Win
     for i in range(len(m)):
 
-        if e in m[i]:
-            CONSTANTS["player spawn"] = (i, m[i].index(e))
-            m[i][m[i].index(e)] = c
+        if b in m[i]:
+            CONSTANTS["player spawn"] = (i, m[i].index(b))
+            m[i][m[i].index(b)] = CONSTANTS["empty map unit"]
 
-        if f in m[i]:
-            CONSTANTS["win"] = (i, m[i].index(f))
+        if c in m[i]:
+            CONSTANTS["win"] = (i, m[i].index(c))
 
             tmp = CONSTANTS["win"][0]
             tmp_list = []
@@ -353,7 +346,7 @@ def create_maze_matrix() -> list[list[int]]:
                     break
             CONSTANTS["map units near win"] = tmp_list
 
-            m[i][m[i].index(f)] = c
+            m[i][m[i].index(c)] = CONSTANTS["empty map unit"]
 
     """
     dlt_it:
@@ -400,4 +393,4 @@ def create_maze_matrix() -> list[list[int]]:
     return m
 
 
-MAZE_MATRIX = create_maze_matrix()
+MATRIX = create_maze_matrix()

@@ -3,9 +3,7 @@
 
 import sys
 import pygame
-from Game_Files.world import World
-from Game_Files.player import Player
-from Game_Files.camera import Camera
+from Game_Files import world, player, camera
 
 
 def main() -> None:
@@ -17,9 +15,9 @@ def main() -> None:
 
     game_clock = pygame.time.Clock()
 
-    le_game_world = World()
-    le_guy = Player(le_game_world)
-    le_cam = Camera(game_window, le_game_world, le_guy)
+    le_game_world = world.World()
+    le_guy = player.Player(le_game_world)
+    le_cam = camera.Camera(game_window, le_game_world, le_guy)
 
     pygame.mixer.music.load("data/LeDamnAudio.ogg")
 
@@ -32,6 +30,10 @@ def main() -> None:
         '''(I) Game Input'''
 
         for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+
+                game_on = False
 
             if event.type == pygame.KEYDOWN:
 

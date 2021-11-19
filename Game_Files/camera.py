@@ -1,8 +1,5 @@
 import pygame
-from Game_Files.maze import CONSTANTS as MAZE_CONSTANTS
-from Game_Files.player import CONSTANTS as PLAYER_CONSTANTS
-from Game_Files.winarea import CONSTANTS as WIN_AREA_CONSTANTS
-from Game_Files.colourcodes import COLOURS, give_shades_list
+from Game_Files import maze, winarea, player, colourcodes
 
 
 class Camera:
@@ -23,8 +20,10 @@ class Camera:
         # out of the screen have to be displayed on both the opposite edges of the screen
         # (if still don't get it, try adding 1 only one time and see what happens :P)
 
-        self.EMPTY_MAP_UNIT_COLOUR_SHADES = give_shades_list(COLOURS["world floor colour"])
-        self.FILLED_MAP_UNIT_COLOUR_SHADES = give_shades_list(COLOURS["world cave rock colour"])
+        self.EMPTY_MAP_UNIT_COLOUR_SHADES = \
+            colourcodes.give_shades_list(colourcodes.COLOURS["world floor colour"])
+        self.FILLED_MAP_UNIT_COLOUR_SHADES = \
+            colourcodes.give_shades_list(colourcodes.COLOURS["world cave rock colour"])
 
         self.x = self.y = 0
         self.x_map_unit = self.x // self.WORLD.MAP_UNIT_SIZE
@@ -44,7 +43,7 @@ class Camera:
 
         a = self.WORLD.MAP_UNIT_SIZE
         b = self.WORLD.MAP_UNIT_SIZE // 3
-        c = MAZE_CONSTANTS["filled map unit"]
+        c = maze.CONSTANTS["filled map unit"]
         d = self.FILLED_MAP_UNIT_COLOUR_SHADES
 
         '''Displaying main empty map unit'''
@@ -119,19 +118,19 @@ class Camera:
         past_light_hotspots = []
         present_light_hotspots = [(self.PTF.cmu[0], self.PTF.cmu[1]), ]
         if self.PTF.win_area_display:
-            present_light_hotspots.append((MAZE_CONSTANTS["win"][0] - 3,
-                                           MAZE_CONSTANTS["win"][1]))
+            present_light_hotspots.append((maze.CONSTANTS["win"][0] - 3,
+                                           maze.CONSTANTS["win"][1]))
         future_light_hotspots = []
 
-        if PLAYER_CONSTANTS["light level"] > 0:
-            light_level = len(self.EMPTY_MAP_UNIT_COLOUR_SHADES) - PLAYER_CONSTANTS["light level"]
+        if player.CONSTANTS["light level"] > 0:
+            light_level = len(self.EMPTY_MAP_UNIT_COLOUR_SHADES) - player.CONSTANTS["light level"]
             if light_level < 0:
                 light_level = 0
             for i in present_light_hotspots:
                 self.display_light_hotspot(i[0], i[1], light_level)
 
         # Displaying map units distance by distance
-        for i in range(PLAYER_CONSTANTS["light level"]):
+        for i in range(player.CONSTANTS["light level"]):
 
             # Doing the light hotspot spreading logic
             for j in present_light_hotspots:
@@ -145,7 +144,7 @@ class Camera:
                 bottom_map_unit = self.WORLD.MAP[bottom[0]][bottom[1]]
                 left_map_unit = self.WORLD.MAP[left[0]][left[1]]
 
-                a = MAZE_CONSTANTS["empty map unit"]
+                a = maze.CONSTANTS["empty map unit"]
                 if top_map_unit == a and top not in \
                         (past_light_hotspots + present_light_hotspots + future_light_hotspots):
                     future_light_hotspots.append(top)
@@ -167,7 +166,7 @@ class Camera:
 
             for k in present_light_hotspots:  # Displaying map units after light hotspot logic
 
-                light_level = i - (PLAYER_CONSTANTS["light level"]
+                light_level = i - (player.CONSTANTS["light level"]
                                    - len(self.EMPTY_MAP_UNIT_COLOUR_SHADES))
                 if light_level < 0:
                     light_level = 0
@@ -177,18 +176,18 @@ class Camera:
 
     def display_player(self) -> None:
         tmp_coords = self.give_display_coords(self.PTF.rect.x, self.PTF.rect.y)
-        pygame.draw.rect(self.DS, COLOURS["player colour"],
+        pygame.draw.rect(self.DS, colourcodes.COLOURS["player colour"],
                          pygame.Rect(tmp_coords, (self.PTF.SIZE, self.PTF.SIZE)))
 
     def display_win_area_unit(self, x_main: int, y_main: int) -> None:
 
         a = self.WORLD.MAP_UNIT_SIZE
         b = self.WORLD.MAP_UNIT_SIZE // 3
-        c = MAZE_CONSTANTS["filled map unit"]
-        d = COLOURS["world cave rock colour"]
+        c = maze.CONSTANTS["filled map unit"]
+        d = colourcodes.COLOURS["world cave rock colour"]
 
         tmp_coords = self.give_display_coords(x_main * a, y_main * a)
-        pygame.draw.rect(self.DS, COLOURS["world win area colour"],
+        pygame.draw.rect(self.DS, colourcodes.COLOURS["world win area colour"],
                          pygame.Rect(tmp_coords, (a, a)))
 
         top = (x_main, y_main - 1)
@@ -245,47 +244,47 @@ class Camera:
             if 0 <= i <= len(self.WORLD.MAP) - 1:
                 for j in range(self.y_map_unit, self.y_map_unit + self.MU_DISPLAYED_Y):
                     if 0 <= j <= len(self.WORLD.MAP[i]) - 1:
-                        if self.WORLD.MAP[i][j] == MAZE_CONSTANTS["empty map unit"]:
+                        if self.WORLD.MAP[i][j] == maze.CONSTANTS["empty map unit"]:
                             self.display_win_area_unit(i, j)
 
     def display_win_area_fake(self) -> None:
         a = self.WORLD.MAP_UNIT_SIZE
         b = self.WORLD.MAP_UNIT_SIZE // 3
-        c = WIN_AREA_CONSTANTS["win area length"] // 10
-        d = WIN_AREA_CONSTANTS["win area breadth"]
+        c = winarea.CONSTANTS["win area length"] // 10
+        d = winarea.CONSTANTS["win area breadth"]
 
         x = self.WORLD.WIN_POSITION[0]
         y = self.WORLD.WIN_POSITION[1] - (d // 2)
         tmp_coords = self.give_display_coords(x * a, y * a)
-        pygame.draw.rect(self.DS, COLOURS["world win area colour"],
+        pygame.draw.rect(self.DS, colourcodes.COLOURS["world win area colour"],
                          pygame.Rect(tmp_coords, (c * a, d * a)))
 
         x = (self.WORLD.WIN_POSITION[0] * a) - b
         y = ((self.WORLD.WIN_POSITION[1] - (d // 2)) * a) - b
         h = (d // 2) * a + b
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock colour"],
+        pygame.draw.rect(self.DS, colourcodes.COLOURS["world cave rock colour"],
                          pygame.Rect(tmp_coords, (b, h)))
 
         x = (self.WORLD.WIN_POSITION[0] * a) - b
         y = (self.WORLD.WIN_POSITION[1] + 1) * a
         h = (d // 2) * a + b
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock colour"],
+        pygame.draw.rect(self.DS, colourcodes.COLOURS["world cave rock colour"],
                          pygame.Rect(tmp_coords, (b, h)))
 
         x = self.WORLD.WIN_POSITION[0] * a
         y = ((self.WORLD.WIN_POSITION[1] - (d // 2)) * a) - b
         w = c * a
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock colour"],
+        pygame.draw.rect(self.DS, colourcodes.COLOURS["world cave rock colour"],
                          pygame.Rect(tmp_coords, (w, b)))
 
         x = self.WORLD.WIN_POSITION[0] * a
         y = (self.WORLD.WIN_POSITION[1] + (d - (d // 2))) * a
         w = c * a
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock colour"],
+        pygame.draw.rect(self.DS, colourcodes.COLOURS["world cave rock colour"],
                          pygame.Rect(tmp_coords, (w, b)))
 
     def display_win_text(self) -> None:
@@ -306,14 +305,14 @@ class Camera:
                             + (j * c) + y_centre_correction
                         win_text_unit_tmp_coords = self.give_display_coords(win_text_unit_x_coord,
                                                                             win_text_unit_y_coord)
-                        pygame.draw.rect(self.DS, COLOURS["world win text colour"],
+                        pygame.draw.rect(self.DS, colourcodes.COLOURS["world win text colour"],
                                          pygame.Rect(win_text_unit_tmp_coords, (c, c)))
 
     def display(self) -> None:
 
         """Basic algorithm for understanding light hotspot algorithm in Demos/lighthotspot.py"""
 
-        self.DS.fill(COLOURS["world bg colour"])
+        self.DS.fill(colourcodes.COLOURS["world bg colour"])
 
         self.move_cam_with_player()
 

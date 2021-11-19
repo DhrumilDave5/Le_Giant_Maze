@@ -285,7 +285,7 @@ LETTER_TO_TEXT_UNITS = {"A": [[0, 1, 1, 1, 0],
                         }
 
 
-def string_to_text_units(s: str) -> list:
+def get_text_units(s: str) -> list:
     tmp = []
     for i in s:
         tmp.append(LETTER_TO_TEXT_UNITS[i])
