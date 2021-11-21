@@ -1,5 +1,4 @@
 import pygame
-from Game_Files import maze, world as world_
 
 CONSTANTS = {"player size in length quanta": 10,
              "light level": 9
@@ -7,9 +6,6 @@ CONSTANTS = {"player size in length quanta": 10,
 
 
 class Player:
-
-    def tmp(self):
-        pass
 
     def __init__(self, world, up_key=pygame.K_w, right_key=pygame.K_d,
                  down_key=pygame.K_s, left_key=pygame.K_a):
@@ -20,7 +16,9 @@ class Player:
         self.DOWN_KEY = down_key
         self.LEFT_KEY = left_key
 
-        lq = world_.CONSTANTS["length quanta"]
+        self.LIGHT_LEVEL = CONSTANTS["light level"]
+
+        lq = self.WORLD.LENGTH_QUANTA
         mus = self.WORLD.MAP_UNIT_SIZE
 
         self.SIZE = lq * CONSTANTS["player size in length quanta"]
@@ -55,7 +53,7 @@ class Player:
         self.win_area_display = False
 
     def update_map_unit_stuff(self) -> None:
-        lq = world_.CONSTANTS["length quanta"]
+        lq = self.WORLD.LENGTH_QUANTA
         mus = self.WORLD.MAP_UNIT_SIZE
         self.tlmu = (self.rect.topleft[0] // mus,
                      self.rect.topleft[1] // mus)
@@ -69,43 +67,43 @@ class Player:
                     self.rect.center[1] // mus)
 
     def move_up(self) -> None:
-        self.rect.y -= world_.CONSTANTS["length quanta"]
+        self.rect.y -= self.WORLD.LENGTH_QUANTA
         self.update_map_unit_stuff()
 
     def move_right(self) -> None:
-        self.rect.x += world_.CONSTANTS["length quanta"]
+        self.rect.x += self.WORLD.LENGTH_QUANTA
         self.update_map_unit_stuff()
 
     def move_down(self) -> None:
-        self.rect.y += world_.CONSTANTS["length quanta"]
+        self.rect.y += self.WORLD.LENGTH_QUANTA
         self.update_map_unit_stuff()
 
     def move_left(self) -> None:
-        self.rect.x -= world_.CONSTANTS["length quanta"]
+        self.rect.x -= self.WORLD.LENGTH_QUANTA
         self.update_map_unit_stuff()
 
     def check_up_collision(self) -> None:
-        a = maze.CONSTANTS["filled map unit"]
-        if self.WORLD.MAP[self.tlmu[0]][self.tlmu[1]] == a \
-                or self.WORLD.MAP[self.trmu[0]][self.trmu[1]] == a:
+        a = self.WORLD.MAP_UNITS["filled"]
+        if self.WORLD.map[self.tlmu[0]][self.tlmu[1]] == a \
+                or self.WORLD.map[self.trmu[0]][self.trmu[1]] == a:
             self.move_down()
 
     def check_right_collision(self) -> None:
-        a = maze.CONSTANTS["filled map unit"]
-        if self.WORLD.MAP[self.trmu[0]][self.trmu[1]] == a \
-                or self.WORLD.MAP[self.brmu[0]][self.brmu[1]] == a:
+        a = self.WORLD.MAP_UNITS["filled"]
+        if self.WORLD.map[self.trmu[0]][self.trmu[1]] == a \
+                or self.WORLD.map[self.brmu[0]][self.brmu[1]] == a:
             self.move_left()
 
     def check_down_collision(self) -> None:
-        a = maze.CONSTANTS["filled map unit"]
-        if self.WORLD.MAP[self.blmu[0]][self.blmu[1]] == a \
-                or self.WORLD.MAP[self.brmu[0]][self.brmu[1]] == a:
+        a = self.WORLD.MAP_UNITS["filled"]
+        if self.WORLD.map[self.blmu[0]][self.blmu[1]] == a \
+                or self.WORLD.map[self.brmu[0]][self.brmu[1]] == a:
             self.move_up()
 
     def check_left_collision(self) -> None:
-        a = maze.CONSTANTS["filled map unit"]
-        if self.WORLD.MAP[self.tlmu[0]][self.tlmu[1]] == a \
-                or self.WORLD.MAP[self.blmu[0]][self.blmu[1]] == a:
+        a = self.WORLD.MAP_UNITS["filled"]
+        if self.WORLD.map[self.tlmu[0]][self.tlmu[1]] == a \
+                or self.WORLD.map[self.blmu[0]][self.blmu[1]] == a:
             self.move_right()
 
     def check_near_win(self) -> None:
@@ -116,7 +114,7 @@ class Player:
 
     def declare_win(self) -> None:
         self.won = True
-        self.WORLD.change_map_to_win_area()
+        self.WORLD.map = self.WORLD.WIN_AREA_MAP
         a = self.WORLD.MAP_UNIT_SIZE
         x = (self.WORLD.WIN_AREA_PLAYER_SPAWN[0] * a) + (self.rect.x % a)
         y = (self.WORLD.WIN_AREA_PLAYER_SPAWN[1] * a) + (self.rect.y % a)

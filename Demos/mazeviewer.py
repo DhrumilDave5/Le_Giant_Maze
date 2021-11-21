@@ -1,15 +1,17 @@
 import sys
 import pygame
-from Game_Files import simplemaze, colourcodes
+from Game_Files import maze, map
+from Game_Files.colourcodes import COLOURS
 
-MAZE_MATRIX_COLOUR_DICT = {0: colourcodes.COLOURS["world floor colour"],
-                           1: colourcodes.COLOURS["world cave rock colour"],
-                           2: colourcodes.COLOURS["player colour"],
-                           3: colourcodes.COLOURS["world win area colour"]
-                           }
+MAZE_MATRIX_COLOUR_DICT = \
+    {map.CONSTANTS["empty map unit"]: COLOURS["world floor"],
+     map.CONSTANTS["filled map unit"]: COLOURS["world cave rock"],
+     map.CONSTANTS["player spawn map unit"]: COLOURS["player"],
+     map.CONSTANTS["win map unit"]: COLOURS["world win area"]
+     }
 
 
-def main() -> None:
+def main(two_d_matrix: list[list[int]]) -> None:
     pygame.init()
     window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     pygame.display.set_caption("Maze Viewer")
@@ -27,20 +29,19 @@ def main() -> None:
                 if event_.key == pygame.K_DOWN and quanta > 1:
                     quanta -= 1
         window.fill((0, 0, 0))
-        for i in range(len(simplemaze.MATRIX)):
-            for j in range(len(simplemaze.MATRIX[i])):
-                colour = MAZE_MATRIX_COLOUR_DICT[simplemaze.MATRIX[i][j]]
-                pygame.draw.rect(window, colour,
-                                 pygame.Rect(i * quanta, j * quanta,
-                                             quanta, quanta))
+        for i in range(len(two_d_matrix)):
+            for j in range(len(two_d_matrix[i])):
+                colour = MAZE_MATRIX_COLOUR_DICT[two_d_matrix[i][j]]
+                rect = pygame.Rect(i * quanta, j * quanta, quanta, quanta)
+                pygame.draw.rect(window, colour, rect)
         text = font.render("TPS: %d" % clock.get_fps(), True,
                            pygame.colordict.THECOLORS["white"])
         window.blit(text, (0, 0))
         pygame.display.flip()
-        clock.tick()
+        clock.tick(60)
     pygame.quit()
     sys.exit()
 
 
 if __name__ == "__main__":
-    main()
+    main(map.create_maze_map(maze.MAZE))
