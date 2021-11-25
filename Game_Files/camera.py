@@ -35,7 +35,7 @@ class Camera:
         # In the above 2 lines, 2 is added because map units extruding
         # partially out of the screen have to be displayed on both the
         # opposite edges of the screen (if still don't get it, try adding
-        # removing the  :P)
+        # only 1 or adding nothing :P)
 
         tmp = self.WORLD.MAP_UNIT_SIZE
         tmp2 = self.WORLD.WIN_TEXT_UNIT_SIZE
