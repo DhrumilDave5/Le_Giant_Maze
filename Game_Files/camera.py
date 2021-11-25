@@ -22,22 +22,27 @@ class Camera:
     def __init__(self, display_surface: pygame.Surface, world,
                  player_to_follow):
 
-        # DS: Display Surface
-        self.DS = display_surface
+        self.DISPLAY_SURFACE = display_surface
         self.WORLD = world
-        # PTF: Player To Follow
-        self.PTF = player_to_follow
+        self.PLAYER_TO_FOLLOW = player_to_follow
 
+        tmp = self.DISPLAY_SURFACE.get_width()
         # MU_DISPLAYED_X: Map Units Displayed in X direction
-        self.MU_DISPLAYED_X = \
-            (self.DS.get_width() // self.WORLD.MAP_UNIT_SIZE) + 2
+        self.MU_DISPLAYED_X = (tmp // self.WORLD.MAP_UNIT_SIZE) + 2
+        tmp = self.DISPLAY_SURFACE.get_height()
         # MU_DISPLAYED_Y: Map Units Displayed in Y direction
-        self.MU_DISPLAYED_Y = \
-            (self.DS.get_height() // self.WORLD.MAP_UNIT_SIZE) + 2
+        self.MU_DISPLAYED_Y = (tmp // self.WORLD.MAP_UNIT_SIZE) + 2
         # In the above 2 lines, 2 is added because map units extruding
         # partially out of the screen have to be displayed on both the
         # opposite edges of the screen (if still don't get it, try adding
         # removing the  :P)
+
+        tmp = self.WORLD.MAP_UNIT_SIZE
+        tmp2 = self.WORLD.WIN_TEXT_UNIT_SIZE
+        self.text_x_centre_correction = \
+            (tmp - (tmp2 * len(self.WORLD.WIN_TEXT[0][0]))) // 2
+        self.text_y_centre_correction = \
+            (tmp - (tmp2 * len(self.WORLD.WIN_TEXT[0]))) // 2
 
         self.EMPTY_MAP_UNIT_COLOUR_SHADES = \
             give_shades_list(COLOURS["world floor"])
@@ -50,12 +55,14 @@ class Camera:
 
     def draw_rect(self, x_and_y, width_and_height, colour) -> None:
         rect = pygame.Rect(x_and_y, width_and_height)
-        pygame.draw.rect(self.DS, colour, rect)
+        pygame.draw.rect(self.DISPLAY_SURFACE, colour, rect)
 
     def move_cam_with_player(self) -> None:
 
-        self.x = self.PTF.rect.centerx - self.DS.get_width() // 2
-        self.y = self.PTF.rect.centery - self.DS.get_height() // 2
+        self.x = self.PLAYER_TO_FOLLOW.rect.centerx \
+            - (self.DISPLAY_SURFACE.get_width() // 2)
+        self.y = self.PLAYER_TO_FOLLOW.rect.centery \
+            - (self.DISPLAY_SURFACE.get_height() // 2)
         self.x_map_unit = self.x // self.WORLD.MAP_UNIT_SIZE
         self.y_map_unit = self.y // self.WORLD.MAP_UNIT_SIZE
 
@@ -68,14 +75,13 @@ class Camera:
 
         a = self.WORLD.MAP_UNIT_SIZE
         b = self.WORLD.MAP_UNIT_SIZE // 3
-        c = self.WORLD.MAP_UNITS["empty"]
+        c = self.WORLD.MAP_UNITS["filled"]
         d = self.FILLED_MAP_UNIT_COLOUR_SHADES
 
         '''Displaying main empty map unit'''
         tmp_coords = self.give_display_coords(x_main * a, y_main * a)
         tmp_colour = self.EMPTY_MAP_UNIT_COLOUR_SHADES[light_level_var]
-        pygame.draw.rect(self.DS, tmp_colour,
-                         pygame.Rect(tmp_coords, (a, a)))
+        self.draw_rect(tmp_coords, (a, a), tmp_colour)
 
         top = (x_main, y_main - 1)
         right = (x_main + 1, y_main)
@@ -86,65 +92,61 @@ class Camera:
         bottom_map_unit = self.WORLD.map[bottom[0]][bottom[1]]
         left_map_unit = self.WORLD.map[left[0]][left[1]]
 
-        '''
-        Displaying filled map units as walls around main empty map unit,
+        '''Displaying filled map units as walls around main empty map unit,
         in the 8 if statements below
         '''
 
         if top_map_unit == c:
             x, y = top[0] * a, y_main * a - b
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (a, b)))
+            self.draw_rect(tmp_coords, (a, b), d[light_level_var])
 
         if right_map_unit == c:
             x, y = right[0] * a, right[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (b, a)))
+            self.draw_rect(tmp_coords, (b, a), d[light_level_var])
 
         if bottom_map_unit == c:
             x, y = bottom[0] * a, bottom[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (a, b)))
+            self.draw_rect(tmp_coords, (a, b), d[light_level_var])
 
         if left_map_unit == c:
             x, y = x_main * a - b, left[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (b, a)))
+            self.draw_rect(tmp_coords, (b, a), d[light_level_var])
 
         if top_map_unit == c and right_map_unit == c:
             x, y = right[0] * a, y_main * a - b
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), d[light_level_var])
 
         if right_map_unit == c and bottom_map_unit == c:
             x, y = right[0] * a, bottom[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), d[light_level_var])
 
         if bottom_map_unit == c and left_map_unit == c:
             x, y = x_main * a - b, bottom[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), d[light_level_var])
 
         if left_map_unit == c and top_map_unit == c:
             x, y = x_main * a - b, y_main * a - b
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d[light_level_var],
-                             pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), d[light_level_var])
 
     def light_hotspot_logic(self) -> None:
 
+        """Basic algorithm for understanding light hotspot algorithm
+        in Demos/lighthotspot.py
+        """
+
         past_light_hotspots = []
-        present_light_hotspots = [(self.PTF.cmu[0], self.PTF.cmu[1]), ]
+        present_light_hotspots = [(self.PLAYER_TO_FOLLOW.cmu[0],
+                                   self.PLAYER_TO_FOLLOW.cmu[1]), ]
         win_area_light_hotspot_position = -3
-        if self.PTF.win_area_display:
+        if self.PLAYER_TO_FOLLOW.win_area_display:
             win_area_light_hotspot_x = self.WORLD.WIN_POSITION[0] \
                 + win_area_light_hotspot_position
             win_area_light_hotspot_y = self.WORLD.WIN_POSITION[1]
@@ -152,16 +154,16 @@ class Camera:
             present_light_hotspots.append(tmp)
         future_light_hotspots = []
 
-        if self.PTF.LIGHT_LEVEL > 0:
+        if self.PLAYER_TO_FOLLOW.LIGHT_LEVEL > 0:
             light_level = len(self.EMPTY_MAP_UNIT_COLOUR_SHADES) \
-                          - self.PTF.LIGHT_LEVEL
+                          - self.PLAYER_TO_FOLLOW.LIGHT_LEVEL
             if light_level < 0:
                 light_level = 0
             for i in present_light_hotspots:
                 self.display_light_hotspot(i[0], i[1], light_level)
 
         # Displaying map units distance by distance
-        for i in range(self.PTF.LIGHT_LEVEL):
+        for i in range(self.PLAYER_TO_FOLLOW.LIGHT_LEVEL):
 
             # Doing the light hotspot spreading logic
             for j in present_light_hotspots:
@@ -198,7 +200,7 @@ class Camera:
                 # Displaying map units after light hotspot logic
 
                 tmp = len(self.EMPTY_MAP_UNIT_COLOUR_SHADES)
-                light_level = i - (self.PTF.LIGHT_LEVEL - tmp)
+                light_level = i - (self.PLAYER_TO_FOLLOW.LIGHT_LEVEL - tmp)
                 if light_level < 0:
                     light_level = 0
                 x_minimum = self.x_map_unit - 1
@@ -212,22 +214,19 @@ class Camera:
                     self.display_light_hotspot(k[0], k[1], light_level)
 
     def display_player(self) -> None:
-        tmp_coords = self.give_display_coords(self.PTF.rect.x,
-                                              self.PTF.rect.y)
-        pygame.draw.rect(self.DS, COLOURS["player"],
-                         pygame.Rect(tmp_coords, (self.PTF.SIZE,
-                                                  self.PTF.SIZE)))
+        tmp_coords = self.give_display_coords(self.PLAYER_TO_FOLLOW.rect.x,
+                                              self.PLAYER_TO_FOLLOW.rect.y)
+        tmp = (self.PLAYER_TO_FOLLOW.SIZE, self.PLAYER_TO_FOLLOW.SIZE)
+        self.draw_rect(tmp_coords, tmp, COLOURS["player"])
 
     def display_win_area_unit(self, x_main: int, y_main: int) -> None:
 
         a = self.WORLD.MAP_UNIT_SIZE
         b = self.WORLD.MAP_UNIT_SIZE // 3
         c = self.WORLD.MAP_UNITS["filled"]
-        d = COLOURS["world cave rock"]
 
         tmp_coords = self.give_display_coords(x_main * a, y_main * a)
-        pygame.draw.rect(self.DS, COLOURS["world win area"],
-                         pygame.Rect(tmp_coords, (a, a)))
+        self.draw_rect(tmp_coords, (a, a), COLOURS["world win area"])
 
         top = (x_main, y_main - 1)
         right = (x_main + 1, y_main)
@@ -241,42 +240,42 @@ class Camera:
         if top_map_unit == c:
             x, y = top[0] * a, y_main * a - b
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (a, b)))
+            self.draw_rect(tmp_coords, (a, b), COLOURS["world cave rock"])
 
         if right_map_unit == c:
             x, y = right[0] * a, right[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (b, a)))
+            self.draw_rect(tmp_coords, (b, a), COLOURS["world cave rock"])
 
         if bottom_map_unit == c:
             x, y = bottom[0] * a, bottom[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (a, b)))
+            self.draw_rect(tmp_coords, (a, b), COLOURS["world cave rock"])
 
         if left_map_unit == c:
             x, y = x_main * a - b, left[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (b, a)))
+            self.draw_rect(tmp_coords, (b, a), COLOURS["world cave rock"])
 
         if top_map_unit == c and right_map_unit == c:
             x, y = right[0] * a, y_main * a - b
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), COLOURS["world cave rock"])
 
         if right_map_unit == c and bottom_map_unit == c:
             x, y = right[0] * a, bottom[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), COLOURS["world cave rock"])
 
         if bottom_map_unit == c and left_map_unit == c:
             x, y = x_main * a - b, bottom[1] * a
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), COLOURS["world cave rock"])
 
         if left_map_unit == c and top_map_unit == c:
             x, y = x_main * a - b, y_main * a - b
             tmp_coords = self.give_display_coords(x, y)
-            pygame.draw.rect(self.DS, d, pygame.Rect(tmp_coords, (b, b)))
+            self.draw_rect(tmp_coords, (b, b), COLOURS["world cave rock"])
 
     def display_win_area(self) -> None:
         x_minimum = self.x_map_unit
@@ -300,83 +299,75 @@ class Camera:
         x = self.WORLD.WIN_POSITION[0]
         y = self.WORLD.WIN_POSITION[1] - (d // 2)
         tmp_coords = self.give_display_coords(x * a, y * a)
-        pygame.draw.rect(self.DS, COLOURS["world win area"],
-                         pygame.Rect(tmp_coords, (c * a, d * a)))
+        self.draw_rect(tmp_coords, (c * a, d * a),
+                       COLOURS["world win area"])
 
         x = (self.WORLD.WIN_POSITION[0] * a) - b
         y = ((self.WORLD.WIN_POSITION[1] - (d // 2)) * a) - b
         h = (d // 2) * a + b
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock"],
-                         pygame.Rect(tmp_coords, (b, h)))
+        self.draw_rect(tmp_coords, (b, h), COLOURS["world cave rock"])
 
         x = (self.WORLD.WIN_POSITION[0] * a) - b
         y = (self.WORLD.WIN_POSITION[1] + 1) * a
         h = (d // 2) * a + b
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock"],
-                         pygame.Rect(tmp_coords, (b, h)))
+        self.draw_rect(tmp_coords, (b, h), COLOURS["world cave rock"])
 
         x = self.WORLD.WIN_POSITION[0] * a
         y = ((self.WORLD.WIN_POSITION[1] - (d // 2)) * a) - b
         w = c * a
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock"],
-                         pygame.Rect(tmp_coords, (w, b)))
+        self.draw_rect(tmp_coords, (w, b), COLOURS["world cave rock"])
 
         x = self.WORLD.WIN_POSITION[0] * a
         y = (self.WORLD.WIN_POSITION[1] + (d - (d // 2))) * a
         w = c * a
         tmp_coords = self.give_display_coords(x, y)
-        pygame.draw.rect(self.DS, COLOURS["world cave rock"],
-                         pygame.Rect(tmp_coords, (w, b)))
+        self.draw_rect(tmp_coords, (w, b), COLOURS["world cave rock"])
+
+    def display_text_unit(self, letter_index, text_unit_row_index,
+                          text_unit_column_index):
+        tmp = self.WORLD.WIN_TEXT_POSITION
+        letter_display_map_unit = (tmp[0] + letter_index, tmp[1])
+        text_unit_x_coord = \
+            (letter_display_map_unit[0] * self.WORLD.MAP_UNIT_SIZE) \
+            + (text_unit_column_index * self.WORLD.WIN_TEXT_UNIT_SIZE) \
+            + self.text_x_centre_correction
+        text_unit_y_coord = \
+            (letter_display_map_unit[1] * self.WORLD.MAP_UNIT_SIZE) \
+            + (text_unit_row_index * self.WORLD.WIN_TEXT_UNIT_SIZE) \
+            + self.text_y_centre_correction
+        text_unit_tmp_coords = \
+            self.give_display_coords(text_unit_x_coord, text_unit_y_coord)
+        text_unit_size = (self.WORLD.WIN_TEXT_UNIT_SIZE,
+                          self.WORLD.WIN_TEXT_UNIT_SIZE)
+        self.draw_rect(text_unit_tmp_coords, text_unit_size,
+                       COLOURS["world win text"])
 
     def display_win_text(self) -> None:
-        a = self.WORLD.WIN_TEXT
-        b = self.WORLD.WIN_TEXT_POSITION
-        c = self.WORLD.WIN_TEXT_UNIT_SIZE
-        d = self.WORLD.MAP_UNIT_SIZE
-        e = COLOURS["world win text"]
-
-        x_centre_correction = (d - (c * len(a[0][0]))) // 2
-        y_centre_correction = (d - (c * len(a[0]))) // 2
-
-        for i in range(len(a)):
-            for j in range(len(a[i])):
-                for k in range(len(a[i][j])):
-                    if a[i][j][k] == 1:
-                        letter_display_map_unit = (b[0] + i, b[1])
-                        win_text_unit_x_coord = \
-                            (letter_display_map_unit[0] * d) \
-                            + (k * c) + x_centre_correction
-                        win_text_unit_y_coord = \
-                            (letter_display_map_unit[1] * d) \
-                            + (j * c) + y_centre_correction
-                        win_text_unit_tmp_coords = \
-                            self.give_display_coords(win_text_unit_x_coord,
-                                                     win_text_unit_y_coord)
-                        self.draw_rect(win_text_unit_tmp_coords, (c, c), e)
-                        # TODO: This indentation bruvh
+        for i in range(len(self.WORLD.WIN_TEXT)):
+            for j in range(len(self.WORLD.WIN_TEXT[i])):
+                for k in range(len(self.WORLD.WIN_TEXT[i][j])):
+                    if self.WORLD.WIN_TEXT[i][j][k] == 1:
+                        self.display_text_unit(i, j, k)
 
     def display(self) -> None:
 
-        """Basic algorithm for understanding light hotspot algorithm
-        in Demos/lighthotspot.py
-        """
-
-        self.DS.fill(COLOURS["world bg"])
+        self.DISPLAY_SURFACE.fill(COLOURS["world bg"])
 
         self.move_cam_with_player()
 
-        if not self.PTF.won:
+        if not self.PLAYER_TO_FOLLOW.won:
             self.light_hotspot_logic()
         else:
             self.display_win_area()
 
-        if not self.PTF.won and self.PTF.win_area_display:
+        if not self.PLAYER_TO_FOLLOW.won \
+                and self.PLAYER_TO_FOLLOW.win_area_display:
             self.display_win_area_fake()
 
         self.display_player()
 
-        if self.PTF.won:
+        if self.PLAYER_TO_FOLLOW.won:
             self.display_win_text()
